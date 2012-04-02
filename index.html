@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="jquery.twitter.min.js"></script>
+    <style type="text/css">
+      body {background: #333; font-size: 64px; color: #999}
+      .twitter-posts {padding: 10px; list-style-type:none; border-bottom: 1px solid #000;}
+      .twitter-posts a {text-decoration:none; color: #FFF;}
+    </style>
+    <script type="text/javascript">
+      // please tell me there is a builtin for this
+      var parseQuerystring = function(){
+        var nvpair = {};
+        var qs = window.location.search.replace('?', '');
+        var pairs = qs.split('&');
+        $.each(pairs, function(i, v){
+          var pair = v.split('=');
+          nvpair[pair[0]] = pair[1];
+        });
+        return nvpair;
+      }
+
+      $(function(){
+          var qs = parseQuerystring();
+          // pass q=query&c=count to override
+          var q = qs['q'] || '@github';
+          var c = qs['c'] || 2000;
+
+          $.twitter({limit: 1000, retweets: false, q: q}, function(tweets){
+            var musings = tweets.results;
+            var tweet_data = {};
+            $.each(musings, function(num, tweet) {
+              tweet_data[tweet.from_user] = tweet;
+            });
+
+            // we can get profile data on 100 people or less at a time
+            // so we need to break up our authors into chunks of 100
+            var authors = Object.keys(tweet_data).splice(0);
+            var batch_count = ((authors.size / 100) + 1)
+            var batches_of_authors = [];
+            while(authors.length){
+              batches_of_authors.push(authors.splice(0,100));
+            }
+
+            $.each(batches_of_authors, function(counter, author_batch){
+
+              var url = "http://api.twitter.com/1/users/lookup.json?callback=?&screen_name=";
+              $.getJSON(url + author_batch.join(), function(profiles){
+                $.each(profiles, function(count, author){
+                  // naive approach to highlight 'influencers'
+                  if (author.followers_count > c){
+                    tweet = tweet_data[author.screen_name];
+                    name  = author.name;
+                    // this should use mustache.js instead
+                    $('#loud-tweets').append($("<li>", {
+                      "class": "twitter-posts",
+                      html: name + " <a href='http://twitter.com/" + tweet.from_user + "' class='profile'>@" + tweet.from_user + "</a> (" + author.followers_count + ") says...<div class='tweet'><a href='http://twitter.com/" + tweet.from_user + "/status/" + tweet.id_str + "'>" + tweet.text + "</a></div>"}));
+                  };
+                });
+              });
+
+            });
+
+
+         });
+
+       });
+    </script>
+  </head>
+  <body>
+    <div id="loud-tweets"></div>
+  </body>
+</html>
