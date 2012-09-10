@@ -4,7 +4,7 @@ What are "influencers" saying about X on twitter, right now?  influencer.tweets 
 
 ## Why?
 
-Becasuse, surprisingly, no "social media" app solves for this yet. The current landscape of social media apps allow you to shout louder into multimple mouth pieces at once. They don't seem to (yet) help you actually have conversations with people.
+Because, surprisingly, no "social media" app solves for this yet. The current landscape of social media apps allow you to shout louder into multiple mouth pieces at once. They don't seem to (yet) help you actually have conversations with people.
 
 I didn't want to miss an "important" tweet about something I care about.
 
